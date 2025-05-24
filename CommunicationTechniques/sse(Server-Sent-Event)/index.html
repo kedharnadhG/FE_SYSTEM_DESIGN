@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Example</title>
+</head>
+<body>
+    <h1>Server-Sent Events Example</h1>
+    <div id="sse-data">
+
+    </div>
+
+    <script>
+        //setup sse logic
+        //Broser gives this "EventSource" default
+        const eventSource = new EventSource('/sse'); //'/sse' this is the end-point where Event-Stream is going to happen
+
+        eventSource.onmessage = (event) => {
+            //we can do whatever we want here!
+            // console.log(event)
+            console.log(event.data);
+
+            const dataContainer = document.getElementById("sse-data");
+            dataContainer.innerHTML += `<p>${event.data} </p>`;
+        }
+    </script>
+</body>
+</html>
