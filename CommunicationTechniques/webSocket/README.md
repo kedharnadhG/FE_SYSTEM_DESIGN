@@ -1,6 +1,16 @@
-# 1:1 Private Chat with Socket.IO - Detailed Guide(implementation pending)
+# 1:1 Private Chat with Socket.IO - Detailed Guide (implementation pending)
 
 This guide explains how to implement a private 1-on-1 chat system using Socket.IO in Node.js and JavaScript.
+
+---
+
+## ✅ Step-by-Step Process (Backend + Client)
+
+### 1. Initialize Project
+
+```bash
+npm init -y
+npm install express socket.io
 
 ---
 
@@ -68,6 +78,54 @@ socket.on("private message", ({ to, message }) => {
 * The server uses the `userId` to find the target user's socket.
 * It then emits the `private message` event only to that socket.
 
+
+
+#### Server-side Implementation
+```js
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const path = require("path");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const users = new Map(); // Maps userId -> socketId
+
+app.use(express.static(path.join(__dirname, "public"))); // Serve HTML files
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.on("register", (userId) => {
+    users.set(userId, socket.id);
+    console.log(`${userId} registered with socket id ${socket.id}`);
+  });
+
+  socket.on("private message", ({ to, message, from }) => {
+    const targetSocketId = users.get(to);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit("private message", { from, message });
+    }
+  });
+
+  socket.on("disconnect", () => {
+    for (const [userId, sockId] of users.entries()) {
+      if (sockId === socket.id) {
+        users.delete(userId);
+        break;
+      }
+    }
+    console.log("Client disconnected");
+  });
+});
+
+server.listen(3000, () => console.log("Server running on http://localhost:3000"));
+
+
+```
+
 ---
 
 ## Step 4: Client-Side Implementation
@@ -120,6 +178,70 @@ socket.on("disconnect", () => {
 
 ---
 
+#### client.js
+```js
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Private Chat</title>
+</head>
+<body>
+  <h2>Private Chat</h2>
+  <div>
+    <label>Your User ID:</label>
+    <input id="userId" />
+    <button onclick="register()">Register</button>
+  </div>
+  <div>
+    <label>Send To:</label>
+    <input id="to" />
+    <label>Message:</label>
+    <input id="message" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <ul id="messages"></ul>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function register() {
+      const userId = document.getElementById("userId").value;
+      socket.emit("register", userId);
+    }
+
+    function sendMessage() {
+      const to = document.getElementById("to").value;
+      const message = document.getElementById("message").value;
+      const from = document.getElementById("userId").value;
+      socket.emit("private message", { to, message, from });
+    }
+
+    socket.on("private message", ({ from, message }) => {
+      const msg = document.createElement("li");
+      msg.textContent = `From ${from}: ${message}`;
+      document.getElementById("messages").appendChild(msg);
+    });
+  </script>
+</body>
+</html>
+
+```
+---
+4. How to Simulate Multiple Clients
+You don’t need multiple HTML files to test. Here are your options:
+
+✅ Option 1: Open in Multiple Tabs
+Open http://localhost:3000 in two or more tabs. Register different user IDs in each and send messages between them.
+
+✅ Option 2: Use Different Browsers
+Open in Chrome and Firefox to simulate different users.
+
+✅ Option 3: Use Incognito Windows
+One user in regular tab, another in private/incognito window.
+---
+
 ## ✅ Summary Checklist
 
 | Step                  | Description                                  |
@@ -131,6 +253,14 @@ socket.on("disconnect", () => {
 | Handle Disconnects    | Remove disconnected users from the user map  |
 
 ---
+
+| Event Name        | Source | Description                                  |
+| ----------------- | ------ | -------------------------------------------- |
+| `register`        | Client | Registers a user with a unique ID            |
+| `private message` | Client | Sends message to another user using `userId` |
+| `private message` | Server | Emits message only to the target socket      |
+| `disconnect`      | Server | Handles cleanup when a socket disconnects    |
+ ---
 
 
 ## 🧪 ✅ What We Did (Simplified Example above)
