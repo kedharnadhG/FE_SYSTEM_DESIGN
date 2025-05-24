@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Long Polling Example</title>
+  </head>
+  <body>
+    <h1>Long Polling Example</h1>
+    <!-- some data has to be shown here in container, that has to be from real-time -->
+    <div id="data-container"></div>
+
+    <script>
+      async function getData(lastData) {
+        try {
+          //in the first request it is undefined(lastData), on the sebsequent requests we have to do something
+          const response = await fetch(`/getData?lastData=${lastData}`);
+          const result = await response.json();
+          document.getElementById("data-container").innerHTML = result.data;
+
+          //if the data has changed, we have to call the getData() function again (to get the updated data)
+
+          // Keep polling with updated data
+          await getData(result.data);
+        } catch (e) {
+          console.log(e);
+          //please handle error scenario(if any)
+
+          // Optional: show error message on UI
+          document.getElementById("data-container").innerHTML =
+            "❌ Failed to get updated data. Retrying...";
+
+          // Retry after a delay (e.g. 3 seconds)
+          setTimeout(() => getData(lastData), 3000);
+        }
+      }
+      
+      //we can call it when document is ready/loaded
+      getData();
+    </script>
+  </body>
+</html>

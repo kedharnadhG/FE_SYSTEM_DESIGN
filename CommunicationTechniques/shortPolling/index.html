@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Short Polling Example</title>
+</head>
+<body>
+    <h1>Short Polling Example</h1>
+    <!-- some data has to be shown here in container, that has to be from real-time -->
+    <div id="data-container"></div>
+
+
+    <script>
+        //we can fetch data from the database/server using short polling
+        //this is a simple example of short polling
+
+        const dataContainer = document.getElementById("data-container");
+
+        async function getData() {
+            try {
+                const response = await fetch("/getData"); // the data get transferred on the n/w call is always the Serialized data (string format)
+                const result = await response.json(); //we have to de-Serialize the data since it is in string format(serialized data)
+                dataContainer.innerHTML = result.data;
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        //we can call it when document is ready/loaded
+       // getData();    //this is normal call, even data get updated, it will not show the updated data
+
+       let intervalId;
+
+       //for short polling, we can call the function every 5 seconds
+        function shortPolling() {
+            intervalId = setInterval(() => {
+                getData();
+            }, 5000);
+        }        
+
+        shortPolling();
+
+                // there are 2-things (IMPORTANT)
+        // 1. whenever we use "setInterval", make sure you are handling the ERRORS
+        // 2. you should have the mechanism for closing the Interval in required cases (like)
+
+        // (on some) Navigation or User-Action or target-Condition (in any of the cases, we have to ensure that we are clearing the Interval in required cases)
+
+        //for to avoid un-necessary calls/polling, we have to use "clearInterval" function
+
+    </script>
+</body>
+</html>
