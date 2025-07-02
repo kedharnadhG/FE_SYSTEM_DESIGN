@@ -1,5 +1,4 @@
-//here we will define all the methods that will be called in terms of fetching data 
-//here we will define all the methods that will be called in terms of updating the data
+//here we will define all the methods that will be called in terms of fetching data  &  updating the data
 
 //we have created a schema called "Query" , in that (what methods we need to call) we have to define those methods inside the "Query" type
 
@@ -50,6 +49,14 @@ export const resolvers = {
             console.log(args);
             const newBook = {...args, id: `${data.books.length + 1}`}
             data.books.push(newBook);
+
+            const author = data.authors.find(
+              (author) => author.id === args.authorId
+            );
+            if (author) {
+              author.booksIds.push(newBook.id);
+            }
+
             return newBook;
         }
     }

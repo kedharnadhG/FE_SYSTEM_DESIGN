@@ -1,1 +1,1 @@
-npm init > Create npm package
+npm init -> Create npm package
