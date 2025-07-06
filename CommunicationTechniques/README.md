@@ -59,3 +59,38 @@ Yes! You can mix both layers to build powerful apps:
 > 🔧 Example Use Case:
 > - A real-time chat app might use **WebSockets + GraphQL Subscriptions**.
 > - A payment service might use **REST APIs + Webhooks**.
+
+
+
+
+
+----------------------- 
+
+### 🎯 How to Explain WebSocket in an Interview
+
+**If asked:**
+
+> “What’s the difference between WebSocket and REST/gRPC?”
+
+You can say:
+
+> **"REST, gRPC, and GraphQL are request-response based — the client sends a request and gets a single response. WebSocket, on the other hand, enables full-duplex communication — both client and server can send messages independently after the initial handshake. That makes it ideal for real-time features like chat, live notifications, or streaming updates."**
+
+Add if needed:
+
+> **"I used WebSocket in one of my projects for real-time updates (e.g., live notifications or collaboration tools), which REST couldn’t handle efficiently without polling."**
+
+---
+
+### 🔍 Summary: Comparison Table
+
+| Protocol   | Communication                      | Real-time Capable | Use Case Examples                 |
+|------------|------------------------------------|-------------------|-----------------------------------|
+| **REST**       | Request-Response                   | ❌ No              | CRUD APIs, standard services       |
+| **GraphQL**    | Request-Response (flexible data)   | ❌ No*             | Selective data fetching            |
+| **gRPC**       | Request-Response (binary)          | 🚫 Partial*        | Microservices, inter-service       |
+| **WebSocket**  | Full-duplex                        | ✅ Yes             | Chat apps, games, live feeds       |
+
+> **\*** _GraphQL has subscriptions (pseudo real-time); gRPC has streaming, but it’s not WebSocket-style real-time for browser apps._
+
+---
